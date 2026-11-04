@@ -1,0 +1,34 @@
+package main
+
+import (
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+)
+
+func get(t *testing.T, path string) *httptest.ResponseRecorder {
+	t.Helper()
+	rec := httptest.NewRecorder()
+	newMux().ServeHTTP(rec, httptest.NewRequest(http.MethodGet, path, nil))
+	return rec
+}
+
+func TestRoot(t *testing.T) {
+	rec := get(t, "/")
+	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"language":"go"`) {
+		t.Fatalf("GET / = %d %s", rec.Code, rec.Body)
+	}
+}
+
+func TestHealthz(t *testing.T) {
+	if rec := get(t, "/healthz"); rec.Code != http.StatusOK {
+		t.Fatalf("GET /healthz = %d", rec.Code)
+	}
+}
+
+func TestUnknownPathIs404(t *testing.T) {
+	if rec := get(t, "/nope"); rec.Code != http.StatusNotFound {
+		t.Fatalf("GET /nope = %d", rec.Code)
+	}
+}
