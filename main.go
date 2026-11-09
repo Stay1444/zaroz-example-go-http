@@ -44,6 +44,8 @@ func main() {
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
+	log.Printf("Starting up...")
+
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	go func() {
